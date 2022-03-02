@@ -1,5 +1,5 @@
 import React, { useState, useReducer } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
 
 const RandomRGB = () => {
   const red = Math.floor(Math.random() * 256);
@@ -50,6 +50,8 @@ export default function App() {
 
   const [ refresh, setRefresh ] = useState(false);
 
+  const [ showColor, setShowColor ] = useState(false);
+
   const reducer = (state, action) => {
     switch (action.color) {
         case 'red':
@@ -73,6 +75,8 @@ export default function App() {
     dispatch({color: 'green', amount: ''});
     dispatch({color: 'blue', amount: ''});
 
+    setShowColor(false);
+
     setRefresh(!refresh);
   };
 
@@ -84,11 +88,22 @@ export default function App() {
     }
   };
 
+  var dynamicStyles = StyleSheet.create({
+    colorBox: {
+      margin: 30,
+      height: 100,
+      width: 100,
+      borderColor: 'black',
+      borderWidth: 1,
+      backgroundColor: `rgb(${red}, ${green}, ${blue})`,
+    },
+  });
+
   return (
     <View style={styles.container}>
-      <Text>Guess the Colour</Text>
-      <Text>Point: {point}</Text>
-      <View style={ {...styles.colorBox, backgroundColor: `rgb(${red}, ${green}, ${blue})` } }></View>
+      <Text style={styles.title}>Guess the Colour</Text>
+      <Text style={styles.score}>Point: {point}</Text>
+      <View style={ dynamicStyles.colorBox }></View>
       <Text>Red ({GetColorHint(guessed_red, red)})</Text>
       <TextInput
         style={styles.input}
@@ -122,7 +137,15 @@ export default function App() {
         }}
         value={guessed_blue}
       />
-      <Text>{red}, {green}, {blue}</Text>
+      <TouchableOpacity
+        onPress={() => {
+          setShowColor(true);
+          setTimeout(() => { setShowColor(false) }, 1000);
+        }}
+        style={styles.showColorButton}
+      >
+        <Text>{showColor ? `${red}, ${green}, ${blue}` : 'Click to See Color for 1 Seconds'}</Text>
+      </TouchableOpacity>
       <Button
         title='Update Color'
         onPress={ () => {
@@ -135,25 +158,33 @@ export default function App() {
 
 
 const styles = StyleSheet.create({
+  title: {
+    fontSize: 25,
+    margin:10,
+  },
+  score:{
+    fontSize: 20,
+    color: 'red',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#fffff2'
+  },
+  showColorButton: {
+    margin: 10,
+    borderColor: 'black',
+    borderWidth: 1,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 5,
   },
   input: {
     margin: 15,
     width: 100,
     borderColor: 'black',
     backgroundColor: 'white',
-    borderWidth: 1
-  },
-  colorBox: {
-    margin: 30,
-    height: 100,
-    width: 100,
-    borderColor: 'black',
     borderWidth: 1
   },
 });
